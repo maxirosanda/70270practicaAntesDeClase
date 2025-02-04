@@ -10,20 +10,23 @@ const getAllPets = async(req,res) => {
     res.send({status:"success",payload:pets})
 }
 
-const createPet = async (req,res)=> {
-    const {name,specie,birthDate} = req.body;
+const createPet = async (req,res,next)=> {
+    try {
+        const {name,specie,birthDate} = req.body;
     if (!name || !specie || !birthDate) {
         CustomError.createError({
             name: "Pet creation error",
             cause: generatePetErrorInfo({name, specie, birthDate}),
             message: "Error Trying to create Pet",
             code: EErrors.INVALID_TYPES_ERROR
-        });
-        
+        });  
     }
     const pet = PetDTO.getPetInputFrom({name,specie,birthDate});
     const result = await petsService.create(pet);
     res.send({status:"success",payload:result})
+    } catch (error) {
+        next(error)
+    }
 }
 
 const updatePet = async(req,res) =>{

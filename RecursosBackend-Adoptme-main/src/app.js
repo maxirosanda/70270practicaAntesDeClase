@@ -36,10 +36,8 @@ app.get('/mockingpets', (req, res) => {
 
     res.send({ status: "success", payload: pets });
 });
-app.use((err, req, res, next) => {
-    console.error(err.stack); // Puedes personalizar esto para registrar los errores
-    res.status(500).send('¡Hubo un error en el servidor!');
-  });
+
+app.use(errorHandler)
 
 mongoose.connect(process.env.MONGO_URL)
 
