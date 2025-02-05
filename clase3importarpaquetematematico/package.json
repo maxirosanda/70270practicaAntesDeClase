@@ -1,0 +1,12 @@
+{
+  "name": "clase3importarpaquetematematico",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "clase3-mi-paquete-matematico": "^1.0.0",
+    "clase3-mi-paquete-matematico2": "^1.0.0",
+    "express": "^4.21.2"
+  }
+}
