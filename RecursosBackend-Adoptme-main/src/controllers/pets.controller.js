@@ -14,6 +14,9 @@ const createPet = async (req,res,next)=> {
     try {
         const {name,specie,birthDate} = req.body;
     if (!name || !specie || !birthDate) {
+        req.logger.error("Incomplete values");
+        
+        ("Error trying to create Pet");
         CustomError.createError({
             name: "Pet creation error",
             cause: generatePetErrorInfo({name, specie, birthDate}),
