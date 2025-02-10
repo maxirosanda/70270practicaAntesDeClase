@@ -38,6 +38,15 @@ app.get('/mockingpets', (req, res) => {
     res.send({ status: "success", payload: pets });
 });
 
+app.get('/api/test/user', (req, res) => {
+    let first_name = faker.person.firstName();
+    let last_name = faker.person.lastName();
+    let email = faker.internet.email();
+    let password = faker.internet.password();
+    res.send({ first_name, last_name, email, password });
+});
+
+
 app.use(errorHandler)
 
 mongoose.connect(process.env.MONGO_URL)
