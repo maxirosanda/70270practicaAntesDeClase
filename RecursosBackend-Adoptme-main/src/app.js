@@ -9,6 +9,8 @@ import sessionsRouter from './routes/sessions.router.js';
 import dotenv from 'dotenv';
 import errorHandler from './middlewares/errors.js'
 import { addLogger, logger } from './utils/logger.js';
+import cluster from 'cluster';
+import { cpus } from 'os';
 
 dotenv.config();
 
@@ -22,6 +24,23 @@ app.use('/api/users',usersRouter);
 app.use('/api/pets',petsRouter);
 app.use('/api/adoptions',adoptionsRouter);
 app.use('/api/sessions',sessionsRouter);
+
+
+app.get('/operacionsencilla', (req, res) => {
+    let sum = 0;
+    for (let i = 0; i < 10000; i++) {
+        sum += i;
+    }
+    res.send({ status: "success", message: `El worker ${process.pid} ha atendido esta petición, el resultado es ${sum}` });
+});
+
+app.get('/operacioncompleja', (req, res) => {
+    let sum = 0;
+    for (let i = 0; i < 5e8; i++) {
+        sum += i;
+    }
+    res.send({ status: "success", message: `El worker ${process.pid} ha atendido esta petición, el resultado es ${sum}` });
+});
 
 app.get('/mockingpets', (req, res) => {
     const pets = [];
@@ -38,17 +57,29 @@ app.get('/mockingpets', (req, res) => {
     res.send({ status: "success", payload: pets });
 });
 
-app.get('/api/test/user', (req, res) => {
-    let first_name = faker.person.firstName();
-    let last_name = faker.person.lastName();
-    let email = faker.internet.email();
-    let password = faker.internet.password();
-    res.send({ first_name, last_name, email, password });
-});
-
-
 app.use(errorHandler)
 
 mongoose.connect(process.env.MONGO_URL)
 
-app.listen(PORT, () => logger.info(`Listening on ${PORT}`));
+const cpusCount = cpus().length;
+
+if(cluster.isPrimary){
+
+    console.log(`Primary ${process.pid} is running`);
+
+    for(let i=0; i<cpusCount; i++){
+        cluster.fork();
+    }
+
+    cluster.on('exit', (worker) => {
+        console.log(`Worker ${worker.process.pid} died. Forking a new worker...`);
+        cluster.fork();
+    });
+
+}else{
+
+    console.log(`Worker ${process.pid} started`);
+    app.listen(8080, () => {
+        logger.info(`Server running on port ${8080}`);
+    });
+}

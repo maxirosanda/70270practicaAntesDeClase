@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/app.js --logger PRODUCTION",
-    "dev": "nodemon src/app.js --logger DEVELOMENT",
+    "start": "node --no-deprecation src/app.js --logger PRODUCTION",
+    "dev": "nodemon --no-deprecation src/app.js --logger DEVELOMENT",
     "test": "mocha test/supertest.test.js"
   },
   "keywords": [],
