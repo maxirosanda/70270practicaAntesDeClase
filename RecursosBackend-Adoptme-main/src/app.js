@@ -11,15 +11,25 @@ import errorHandler from './middlewares/errors.js'
 import { addLogger, logger } from './utils/logger.js';
 import cluster from 'cluster';
 import { cpus } from 'os';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerOptions } from './utils/swagger.js';
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT||8080;
 
+
+const specs = swaggerJsdoc(swaggerOptions);
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(addLogger);
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 app.use('/api/users',usersRouter);
 app.use('/api/pets',petsRouter);
 app.use('/api/adoptions',adoptionsRouter);
