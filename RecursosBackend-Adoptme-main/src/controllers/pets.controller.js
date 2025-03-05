@@ -10,6 +10,15 @@ const getAllPets = async(req,res) => {
     res.send({status:"success",payload:pets})
 }
 
+const getPetById = async(req,res) => {
+    const petId = req.params.pid;
+    const pet = await petsService.getBy(petId);
+    if (!pet) {
+        return res.status(404).send({ status: "error", message: "pet not found" });
+    }
+    res.send({status:"success",payload:pet})
+}
+
 const createPet = async (req,res,next)=> {
     try {
         const {name,specie,birthDate} = req.body;
@@ -42,12 +51,16 @@ const updatePet = async(req,res) =>{
 const deletePet = async(req,res)=> {
     const petId = req.params.pid;
     const result = await petsService.delete(petId);
+    if (!result) {
+        return res.status(404).send({ status: "error", message: "pet not found" });
+    }
     res.status(200).send({status:"success",message:"pet deleted"});
 }
 
 const createPetWithImage = async(req,res) =>{
     const file = req.file;
     const {name,specie,birthDate} = req.body;
+    console.log({name,specie,birthDate})
     if(!name||!specie||!birthDate) return res.status(400).send({status:"error",error:"Incomplete values"})
     console.log(file);
     const pet = PetDTO.getPetInputFrom({
@@ -62,6 +75,7 @@ const createPetWithImage = async(req,res) =>{
 }
 export default {
     getAllPets,
+    getPetById,
     createPet,
     updatePet,
     deletePet,
