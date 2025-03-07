@@ -17,10 +17,6 @@ describe('Testing Adoptme', () => {
             }
 
             const { statusCode, ok, _body } = await requester.post('/api/pets').send(petMock);
-            
-            console.log(statusCode);
-            console.log(ok);
-            console.log(_body);
 
             // Verificamos que la respuesta sea correcta
             expect(statusCode).to.equal(200);
@@ -47,14 +43,14 @@ describe('Testing Adoptme', () => {
 
         it('Debe obtener todas las mascotas con GET y la respuesta debe ser un array', async () => {
             const { statusCode, ok, _body } = await requester.get('/api/pets');
-
+            console.log(_body)
             expect(statusCode).to.equal(200);
             expect(ok).to.be.true;
             expect(_body).to.have.property('status', 'success');
             expect(_body.payload).to.be.an('array');
         });
 
-        it('Debe actualizar la mascota con PUT', async () => {
+       it('Debe actualizar la mascota con PUT', async () => {
     
             if (!createdPetId) {
                 throw new Error('No se pudo obtener el ID de la mascota creada en la prueba anterior.');
@@ -65,12 +61,13 @@ describe('Testing Adoptme', () => {
             };
 
             const { statusCode, _body } = await requester.put(`/api/pets/${createdPetId}`).send(updateData);
-
+            
             expect(statusCode).to.equal(200);
             expect(_body).to.have.property('status', 'success');
             
             // Verificar que el valor se actualizó correctamente
             const { statusCode: getStatusCode, _body: getBody } = await requester.get(`/api/pets/${createdPetId}`);
+            console.log(getBody)
             expect(getStatusCode).to.equal(200);
             expect(getBody.payload).to.have.property('name', 'Patitas Actualizado');
         });
@@ -83,7 +80,7 @@ describe('Testing Adoptme', () => {
             const { statusCode, _body } = await requester.delete(`/api/pets/${createdPetId}`);
 
             expect(statusCode).to.equal(200);
-            expect(_body).to.have.property('status', 'message');
+            expect(_body).to.have.property('status', 'success');
 
             // Verificar que la mascota ya no existe
             const { statusCode: statusAfterDelete, _body: bodyAfterDelete } = await requester.get(`/api/pets/${createdPetId}`);
@@ -91,4 +88,22 @@ describe('Testing Adoptme', () => {
             expect(bodyAfterDelete).to.have.property('status', 'error');
         });
     });
+    describe('Test uploads',() => {
+        it('Debe subir una imagen correctamente', async () => {
+            const mockPet = {
+                name: "Patitas",
+                specie: "Pez",
+                birthDate: "10-10-2022",
+            }
+            const result = await requester.post('/api/pets/withimage')
+            .field('name',mockPet.name)
+            .field('specie',mockPet.specie)
+            .field('birthDate',mockPet.birthDate)
+            .attach('image','./test/coderDog.jpg');
+    
+            expect(result.statusCode).to.equal(200);
+            expect(result.ok).to.be.true;
+            expect(result.body.payload).to.have.property('_id');
+        })
+    })
 });

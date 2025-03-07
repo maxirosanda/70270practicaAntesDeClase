@@ -44,13 +44,13 @@ const current = async(req,res) =>{
 }
 
 const unprotectedLogin  = async(req,res) =>{
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).send({ status: "error", error: "Incomplete values" });
-    const user = await usersService.getUserByEmail(email);
-    if(!user) return res.status(404).send({status:"error",error:"User doesn't exist"});
-    const isValidPassword = await passwordValidation(user,password);
-    if(!isValidPassword) return res.status(400).send({status:"error",error:"Incorrect password"});
-    const token = jwt.sign(user,'tokenSecretJWT',{expiresIn:"1h"});
+    const { email, password,first_name,last_name } = req.body;
+    if (!email || !password || !first_name || !last_name) return res.status(400).send({ status: "error", error: "Incomplete values" });
+    //const user = await usersService.getUserByEmail(email);
+    //if(!user) return res.status(404).send({status:"error",error:"User doesn't exist"});
+    //const isValidPassword = await passwordValidation(user,password);
+    //if(!isValidPassword) return res.status(400).send({status:"error",error:"Incorrect password"});
+    const token = jwt.sign({email,password,first_name,last_name},'tokenSecretJWT',{expiresIn:"1h"});
     res.cookie('unprotectedCookie',token,{maxAge:3600000}).send({status:"success",message:"Unprotected Logged in"})
 }
 const unprotectedCurrent = async(req,res)=>{
