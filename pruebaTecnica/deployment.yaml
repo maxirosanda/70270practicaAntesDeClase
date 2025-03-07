@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-api-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: express-api-pod
+  template:
+    metadata:
+      labels:
+        app: express-api-pod
+    spec:
+      containers:
+      - name: express-app-container
+        image: maxirosanda/express-api:v1  
+        ports:
+        - containerPort: 3000
