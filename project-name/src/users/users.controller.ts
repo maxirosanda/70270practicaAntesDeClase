@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,Query, HttpException, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,26 +9,40 @@ export class UsersController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+
+    if(!createUserDto.firstName || !createUserDto.lastName || !createUserDto.email || !createUserDto.password) {
+      throw new HttpException('Incomplete values', HttpStatus.BAD_REQUEST);
+    }
+
+    const user = this.usersService.create(createUserDto);
+    return {status: 'success', data: user};
+    
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query("limit") limit: number) {
+    const user = this.usersService.findAll(limit);
+    return {status: 'success', data: user};
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+
+    if(isNaN(+id)) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    const user = this.usersService.findOne(+id);
+    return {status: 'success', data: user};
+
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    const message = this.usersService.update(+id, updateUserDto);
+    return {status: 'success', message};
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    const message = this.usersService.remove(+id);
+    return {status: 'success', message};
   }
 }
