@@ -11,6 +11,10 @@ export default class Users {
         return userModel.findOne(params);
     }
 
+    saveDocuments = (id,doc) =>{
+        return userModel.findByIdAndUpdate(id,{$push:{documents:doc}},{new:true})
+    }
+
     save = (doc) =>{
         return userModel.create(doc);
     }

@@ -33,6 +33,9 @@ const login = async (req, res) => {
     if(!isValidPassword) return res.status(400).send({status:"error",error:"Incorrect password"});
     const userDto = UserDTO.getUserTokenFrom(user);
     const token = jwt.sign(userDto,'tokenSecretJWT',{expiresIn:"1h"});
+    const dateNow = Date.now();
+    const result = await usersService.update(user._id,{last_connection:dateNow});
+    console.log(result);
     res.cookie('coderCookie',token,{maxAge:3600000}).send({status:"success",message:"Logged in"})
 }
 
